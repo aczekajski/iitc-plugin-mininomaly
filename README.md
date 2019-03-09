@@ -6,6 +6,8 @@ Provides possibility to run local portal battle event for your community. Runs i
 ### Requirements
 Required tampermonkey plugins are IITC and Bookmarks plugin. Having more plugins than necessary is not advised since it may slow down or interfere with the Mininomaly plugin.
 
+Optional: "empty" Telegram bot to send measurements info to given chat. Without bot config, measurements info will be logged to console only and therefore disappear after every iitc refresh.
+
 ### Configuration
 ```js
 plugin.miniNomalyPlugin.configureMininomaly(
@@ -19,9 +21,10 @@ plugin.miniNomalyPlugin.configureMininomaly(
 ```
 
 ### Running
-1. Set localStorage values:
+1. Set localStorage value:
 ```js
 window.localStorage['PRIV.initMininomalyAutomatically'] = 'true';
+// if you're using Telegram bot:
 window.localStorage['PRIV.tgBotToken'] = '123456789:qwertyuiop'; // your private token to tg bot
 window.localStorage['PRIV.tgChatId'] = '123456789'; // id of chat where your bot should send the measurement info
 ```
