@@ -2,6 +2,9 @@
 
 Provides possibility to run local portal battle event for your community. Runs in your browser, doesn't perform excessive requests, doesn't use external tools, doesn't store data about players.
 
+## Implemented mechanics
+**Portal battle:** You can provide a playbox through the bookmarks. From the playbox, given number of portals will be chosen every X minutes. At the same time the faction ownership of previous set of portals will be checked. This way the raw score for measurement will be counted. The number and interval between measurements can be configured. Final score for a faction is this faction best result achieved through all measurements. Factions results can be also separately multiplied if you choose to provide a bonus (in case one faction is significantly outnumbered).
+
 ## Usage
 ### Requirements
 Required tampermonkey plugins are IITC and Bookmarks plugin. Having more plugins than necessary is not advised since it may slow down or interfere with the Mininomaly plugin.
@@ -21,7 +24,7 @@ plugin.miniNomalyPlugin.configureMininomaly(
 ```
 
 ### Running
-1. Set localStorage value:
+1. Set `localStorage` values:
 ```js
 window.localStorage['PRIV.initMininomalyAutomatically'] = 'true';
 // if you're using Telegram bot:
