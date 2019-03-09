@@ -1,0 +1,25 @@
+{
+  "name": "iitc-plugin-mininomaly",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/plugin.user.js",
+  "scripts": {
+    "dev": "webpack-serve --config webpack.config.js",
+    "build": "webpack --config webpack.config.js"
+  },
+  "author": "Lorcik",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.3.4",
+    "@babel/preset-env": "^7.3.4",
+    "@types/node": "^10.5.8",
+    "babel-loader": "^8.0.5",
+    "copy-webpack-plugin": "^4.5.2",
+    "fork-ts-checker-webpack-plugin": "^0.4.8",
+    "ts-loader": "^4.4.2",
+    "typescript": "^3.0.1",
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.2.3",
+    "webpack-serve": "^2.0.3"
+  }
+}

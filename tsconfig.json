@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "noImplicitAny": false,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "sourceMap": true,
+        "checkJs": true,
+        "allowJs": true,
+        "esModuleInterop": true,
+    },
+    "include": [
+        "src/**/*",
+        "./index.d.ts",
+    ],
+    "exclude": [
+        "node_modules",
+    ]
+}
