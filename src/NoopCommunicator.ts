@@ -6,11 +6,11 @@ export default class NoopCommunicator implements BotCommunicator {
         console.log('sendNextMeasurementList', measurementNumber, time, portals);
     }
 
-    sendNextMeasurementImage = (allPortals: BookmarksPortalInfo[], ornamented: BookmarksPortalInfo[], previous: BookmarksPortalInfo[]) => {
-        console.log('sendNextMeasurementImage', allPortals, ornamented, previous);
+    sendNextMeasurementImage = (allPortals: BookmarksPortalInfo[], ornamented: BookmarksPortalInfo[], previous: BookmarksPortalInfo[], measurementNumber: number, measurementTime: number) => {
+        console.log('sendNextMeasurementImage', allPortals, ornamented, previous, measurementNumber, measurementTime);
     }
 
-    sendMeasurementResult = (measurementNumber: number, points: MeasurementPoints, totalPoints: MeasurementPoints) => {
-        console.log('sendMeasurementResult', measurementNumber, points, totalPoints);
+    sendMeasurementResult = (measurementNumber: number, numberOfMeasurements: number, points: MeasurementPoints, totalPoints: MeasurementPoints) => {
+        console.log('sendMeasurementResult', measurementNumber, numberOfMeasurements, points, totalPoints);
     }
 }
