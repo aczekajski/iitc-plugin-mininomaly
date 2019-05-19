@@ -100,7 +100,7 @@ export default class MiniNomalyPlugin {
                             }
                         }
                     }
-                    this.botCommunicator.sendMeasurementResult(currentMeasurement, measurementResult.points, total);
+                    this.botCommunicator.sendMeasurementResult(currentMeasurement, options.numberOfMeasurements, measurementResult.points, total);
                 }
                 console.log('mininomaly: WAITING FOR MAP LOAD');
                 window.addHook('mapDataRefreshEnd', mapLoadedCallback);
@@ -138,6 +138,8 @@ export default class MiniNomalyPlugin {
                 this.getAllPlayboxPortals(),
                 nextMeasurement,
                 this.getAllPlayboxPortals(),
+                currentMeasurement + 1,
+                options.firstMeasurementTime + (currentMeasurement + 1) * options.measurementInterval,
             );
         } else {
             localStorage['mininomaly.phase'] = 'end';
