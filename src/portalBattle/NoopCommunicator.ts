@@ -1,4 +1,5 @@
-import { BookmarksPortalInfo, MeasurementPoints, BotCommunicator } from "./interfaces";
+import { BookmarksPortalInfo, MeasurementPoints } from "../commonInterfaces";
+import { BotCommunicator } from "./interfaces";
 
 export default class NoopCommunicator implements BotCommunicator {
 

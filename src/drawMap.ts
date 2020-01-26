@@ -1,30 +1,78 @@
-import { BookmarksPortalInfo } from "./interfaces";
+import { LatLng } from "./commonInterfaces";
+import colors from "./colors";
 
-const mapLines = window.localStorage['PRIV.mapLines'] || [];
+const mapLines = JSON.parse(window.localStorage['PRIV.mapLines']) || [];
 
-const getLatLng = (latlng: string) => {
+const getLatLngFromE6 = (latlng: string): LatLng => {
     const split = latlng.split(',');
     return { lat: +split[0], lng: +split[1] };
 }
 
-interface LatLng {
-    lat: number;
-    lng: number;
-}
+const degToRad = (deg: number) => deg * Math.PI / 180;
 
 interface Pos {
     x: number;
     y: number;
 }
 
-export default (allPortals: BookmarksPortalInfo[], ornamentedPortals: BookmarksPortalInfo[], previousPortals: BookmarksPortalInfo[], measurementNumber: number, measurementTime: number) => {
+export type Color = [number, number, number] | string;
+
+interface GenericMapSettings {
+    portals: LatLng[];
+    drawPortals?: boolean;
+    measurementNumber?: number;
+    measurementTime?: number;
+
+    ornamentedPortals?: Array<{ pos: LatLng; color?: Color; }>;
+    targetPortals?: Array<{ pos: LatLng; color?: Color; }>;
+
+    lines?: Array<{ latLngs: LatLng[], color?: Color }>;
+
+    legend?: Array<{ label: string; color: Color; }>;
+}
+
+const DEFAULT_ORNAMENT_COLOR: Color = [0, 255, 236];
+
+const getColor = (color: Color, alpha: number = 0) => {
+    let colorArray = color;
+    if (typeof color === 'string') {
+        colorArray = colors[color] || DEFAULT_ORNAMENT_COLOR;
+    }
+    const [r, g, b] = colorArray as [number, number, number];
+
+    return alpha > 0 ? `rgba(${r}, ${g}, ${b}, ${alpha})` : `rgb(${r}, ${g}, ${b})`;
+}
+
+const drawNGon = (ctx: CanvasRenderingContext2D, centerX: number, centerY: number, r: number, n: number) => {
+    for (let i = 0; i <= n; ++i) {
+        const angle = degToRad(i * 360 / n);
+        const x = centerX + r * Math.sin(angle);
+        const y = centerY + r * Math.cos(angle);
+        if (i === 0) {
+            ctx.moveTo(x, y);
+        } else {
+            ctx.lineTo(x, y);
+        }
+    }
+}
+
+export const drawMapGeneric = ({
+    portals,
+    drawPortals,
+    measurementNumber,
+    measurementTime,
+    ornamentedPortals,
+    targetPortals,
+    lines,
+    legend,
+}: GenericMapSettings) => {
     const canvas = document.createElement('canvas');
 
     const posMin: LatLng = { lat: Infinity, lng: Infinity };
     const posMax: LatLng = { lat: -Infinity, lng: -Infinity };
 
-    for (const portal of allPortals) {
-        const pos = getLatLng(portal.latlng);
+    for (const portal of portals) {
+        const pos = portal;
         if (pos.lat < posMin.lat) posMin.lat = pos.lat;
         if (pos.lng < posMin.lng) posMin.lng = pos.lng;
         if (pos.lat > posMax.lat) posMax.lat = pos.lat;
@@ -39,14 +87,16 @@ export default (allPortals: BookmarksPortalInfo[], ornamentedPortals: BookmarksP
     const lngLength = Math.cos(latMean * Math.PI / 180) * lngLengthAtEquator;
 
     const margins = 20;
+    const legendEntrySpace = 30;
+    const legendMargin = ((legend && legend.length || 0) + 1) * legendEntrySpace;
 
     const canvasWidth = Math.ceil(Math.abs((posMin.lng - posMax.lng) * multiplier * lngLength)) + 2 * margins;
-    const canvasHeight = Math.ceil(Math.abs((posMin.lat - posMax.lat) * multiplier * latLength)) + 2 * margins;
+    const canvasHeight = Math.ceil(Math.abs((posMin.lat - posMax.lat) * multiplier * latLength)) + 2 * margins + legendMargin;
 
     const latLngToXY = (latLng: LatLng): Pos => {
         return {
             x: (latLng.lng - posMin.lng) * multiplier * lngLength + margins,
-            y: canvasHeight - ((latLng.lat - posMin.lat) * multiplier * latLength + margins),
+            y: canvasHeight - ((latLng.lat - posMin.lat) * multiplier * latLength + margins) - legendMargin,
         }
     }
 
@@ -73,23 +123,52 @@ export default (allPortals: BookmarksPortalInfo[], ornamentedPortals: BookmarksP
             ctx.lineTo(pos.x, pos.y);
         }
         ctx.stroke();
+        ctx.closePath();
     }
 
-    // draw ornaments
-    ctx.fillStyle = 'rgba(0, 255, 236, 0.3)';
-    ctx.strokeStyle = 'rgb(0, 255, 236)';
+    // draw lines
+    for (const line of lines) {
+        const points = line.latLngs;
+        const first = points.shift();
+
+        ctx.strokeStyle = getColor(line.color || DEFAULT_ORNAMENT_COLOR);
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        const pos = latLngToXY(first);
+        ctx.moveTo(pos.x, pos.y);
+        for (const point of points) {
+            const pos = latLngToXY(point);
+            ctx.lineTo(pos.x, pos.y);
+        }
+        ctx.stroke();
+        ctx.closePath();
+    }
+
+    // draw ornaments (hexagonal)
     ctx.lineWidth = 2;
     for (const portal of ornamentedPortals) {
-        const pos = latLngToXY(getLatLng(portal.latlng));
+        ctx.fillStyle = getColor(portal.color || DEFAULT_ORNAMENT_COLOR, 0.3);
+        ctx.strokeStyle = getColor(portal.color || DEFAULT_ORNAMENT_COLOR);
+
+        const pos = latLngToXY(portal.pos);
         const r = 10;
         ctx.beginPath();
-        ctx.moveTo(pos.x + r, pos.y);
-        ctx.lineTo(pos.x + r / 2, pos.y + r * Math.sqrt(3) / 2);
-        ctx.lineTo(pos.x - r / 2, pos.y + r * Math.sqrt(3) / 2);
-        ctx.lineTo(pos.x - r, pos.y);
-        ctx.lineTo(pos.x - r / 2, pos.y - r * Math.sqrt(3) / 2);
-        ctx.lineTo(pos.x + r / 2, pos.y - r * Math.sqrt(3) / 2);
-        ctx.lineTo(pos.x + r, pos.y);
+        drawNGon(ctx, pos.x, pos.y, r, 6);
+        ctx.stroke();
+        ctx.fill();
+        ctx.closePath();
+    }
+
+    // draw targets (triangles)
+    ctx.lineWidth = 2;
+    for (const portal of targetPortals) {
+        ctx.fillStyle = getColor(portal.color || DEFAULT_ORNAMENT_COLOR, 0.3);
+        ctx.strokeStyle = getColor(portal.color || DEFAULT_ORNAMENT_COLOR);
+
+        const pos = latLngToXY(portal.pos);
+        const r = 18;
+        ctx.beginPath();
+        drawNGon(ctx, pos.x, pos.y, r, 3);
         ctx.stroke();
         ctx.fill();
         ctx.closePath();
@@ -97,11 +176,11 @@ export default (allPortals: BookmarksPortalInfo[], ornamentedPortals: BookmarksP
 
     //PREV
 
-    if (previousPortals) {
+    if (drawPortals || true) {
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
         ctx.lineWidth = 2;
-        for (const portal of previousPortals) {
-            const pos = latLngToXY(getLatLng(portal.latlng));
+        for (const portal of portals) {
+            const pos = latLngToXY(portal);
             const r = 5;
             // ctx.fillRect((pos.lng - posMin.lng) * multiplier - 5, canvasHeight - (pos.lat - posMin.lat) * multiplier - 5, 10, 10);
             ctx.beginPath()
@@ -118,23 +197,36 @@ export default (allPortals: BookmarksPortalInfo[], ornamentedPortals: BookmarksP
         }
     }
 
+    // draw bg
+    ctx.fillStyle = 'rgb(20, 20, 20)';
+    ctx.fillRect(0, canvasHeight - legendMargin, canvasWidth, canvasHeight);
+
     const measurementDate = new Date(measurementTime);
     const timeText = `${measurementDate.getHours()}:${(measurementDate.getMinutes() < 10 ? '0' : '') + measurementDate.getMinutes()}`;
     ctx.fillStyle = 'rgb(0, 255, 236)';
     ctx.font = '14px Coda';
     ctx.textAlign = 'right';
     ctx.fillText(`measurement at ${timeText}`, canvasWidth - 5, canvasHeight - 5);
-    //
-    // const imageData = canvas.toDataURL("image/png");
 
-    // const image = document.createElement('img');
-    // image.setAttribute('style', 'position:absolute;top:0;left:0;z-index:9999999999999;');
-    // image.setAttribute('src', imageData);
-    // document.body.appendChild(image);
+    legend.forEach((entry, i) => {
+        ctx.fillStyle = 'rgb(180, 180, 180)';
+        ctx.textAlign = 'left';
+        ctx.fillText(entry.label, 40, canvasHeight - legendMargin + i * legendEntrySpace + 1.5 * legendEntrySpace - 10);
 
-    // canvas.toBlob((blob) => {
-    //     TgBotCommunicator.sendImage(blob);
-    // });
+        ctx.fillStyle = getColor(entry.color || DEFAULT_ORNAMENT_COLOR, 0.3);
+        ctx.strokeStyle = getColor(entry.color || DEFAULT_ORNAMENT_COLOR);
+
+        const pos = {
+            x: 20,
+            y: canvasHeight - legendMargin + i * legendEntrySpace + legendEntrySpace
+        };
+        const r = 10;
+        ctx.beginPath();
+        drawNGon(ctx, pos.x, pos.y, r, 6);
+        ctx.stroke();
+        ctx.fill();
+        ctx.closePath();
+    });
 
     return canvas;
 }

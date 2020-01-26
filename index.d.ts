@@ -8,6 +8,17 @@ declare function dialog(config: {}): void;
 
 declare var L: any;
 
+interface PortalData {
+    health: number;
+    image: string;
+    level: number;
+    latE6: number;
+    lngE6: number;
+    resCount: number;
+    team: 'R' | 'E' | 'N';
+    title: string;
+}
+
 interface Window {
     plugin: any;
     addHook: (hook: string, callback: () => void) => void;
@@ -16,7 +27,13 @@ interface Window {
     bootPlugins: Array<any>;
     iitcLoaded: boolean;
     map: any; // TODO: prepare better interface
-    portals: { [key: string]: any }; // TODO: prepare better interface
+    portals: {
+        [key: string]: {
+            _latlng?: { lat: number; lng: number; };
+            options?: { data?: PortalData; guid: string; };
+        }
+    }; // TODO: prepare better interface
+    links: { [key: string]: any }; // TODO: prepare better interface
     selectedPortal: any; // TODO: prepare better interface
     ornaments: any; // TODO: prepare better interface
     artifact: any; // TODO: prepare better interface
