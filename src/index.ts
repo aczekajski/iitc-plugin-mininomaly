@@ -7,6 +7,10 @@ import TeamShardsGame, { ShardsBotCommunicator } from "./teamShards/TeamShardsGa
 import ShardsNoopCommunicator from "./teamShards/ShardsNoopCommunicator";
 import ShardsTgBotCommunicator from "./teamShards/ShardsTgBotCommunicator";
 
+if (typeof window.plugin === 'undefined') {
+    window.plugin = {};
+}
+
 if (window.localStorage['PRIV.initMininomalyAutomatically'] === 'true') {
     if (window.localStorage['PRIV.game'] === 'portalBattle') {
         let botCommunicator: BotCommunicator;
