@@ -24,7 +24,7 @@ Required tampermonkey plugins are IITC and Bookmarks plugin. Having more plugins
 Optional: "empty" Telegram bot to send measurements info to given chat. Without bot config, measurements info will be logged to console only and therefore disappear after every iitc refresh.
 
 ### Installation
-1. Go to the ("Releases")[https://github.com/aczekajski/iitc-plugin-mininomaly/releases] and download the `plugin.user.js` file from the newest release.
+1. Go to the [Releases](https://github.com/aczekajski/iitc-plugin-mininomaly/releases) and download the `plugin.user.js` file from the newest release.
 2. Install it using your userscripts engine of choice (eg. Tampermonkey) and make sure it runs after the IITC.
 3. Make sure you're using a modern browser (newest Chrome/Opera is advised)
 
