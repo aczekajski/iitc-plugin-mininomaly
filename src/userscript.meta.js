@@ -1,10 +1,10 @@
 // ==UserScript==
 // @id             iitc-plugin-mininomaly
-// @name           IITC plugin: Mininomaly - portal battle
-// @version        1.0
-// @description    For anomaly-like portal battle event
-// @include        https://*.ingress.com/intel*
-// @include        http://*.ingress.com/intel*
+// @name           IITC plugin: Mininomaly
+// @version        2.0
+// @description    For anomaly-like events
+// @match          https://intel.ingress.com/*
+// @match          http://intel.ingress.com/*
 // @match          https://*.ingress.com/intel*
 // @match          http://*.ingress.com/intel*
 // @grant          none

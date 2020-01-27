@@ -7,7 +7,12 @@
         "checkJs": true,
         "allowJs": true,
         "esModuleInterop": true,
+        "target": "es2017",
     },
+    "lib": [
+        "es2017",
+        "dom"
+    ],
     "include": [
         "src/**/*",
         "./index.d.ts",

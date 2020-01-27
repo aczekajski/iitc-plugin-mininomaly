@@ -1,5 +1,7 @@
-import { BookmarksPortalInfo, MeasurementPoints, BotCommunicator } from "./interfaces";
-import drawMap from "./drawMap";
+import { BookmarksPortalInfo, MeasurementPoints } from "../commonInterfaces";
+import { BotCommunicator } from "./interfaces";
+import { drawMapGeneric } from "../drawMap";
+import { getLatLngFromBookmark } from "../iitcHelpers";
 
 export default class TgBotCommunicator implements BotCommunicator {
     botToken: string;
@@ -37,7 +39,13 @@ export default class TgBotCommunicator implements BotCommunicator {
     }
 
     sendNextMeasurementImage = (allPortals: BookmarksPortalInfo[], ornamented: BookmarksPortalInfo[], previous: BookmarksPortalInfo[], measurementNumber: number, measurementTime: number) => {
-        const canvas = drawMap(allPortals, ornamented, previous, measurementNumber, measurementTime);
+        const canvas = drawMapGeneric({
+            drawPortals: true,
+            portals: allPortals.map(getLatLngFromBookmark),
+            ornamentedPortals: ornamented.map((portal) => ({ pos: getLatLngFromBookmark(portal) })),
+            measurementNumber,
+            measurementTime,
+        });
 
         canvas.toBlob((blob) => {
             this.sendImage(blob);
