@@ -40,6 +40,7 @@ export default class TgBotCommunicator implements BotCommunicator {
 
     sendNextMeasurementImage = (allPortals: BookmarksPortalInfo[], ornamented: BookmarksPortalInfo[], previous: BookmarksPortalInfo[], measurementNumber: number, measurementTime: number) => {
         const canvas = drawMapGeneric({
+            drawPortals: true,
             portals: allPortals.map(getLatLngFromBookmark),
             ornamentedPortals: ornamented.map((portal) => ({ pos: getLatLngFromBookmark(portal) })),
             measurementNumber,

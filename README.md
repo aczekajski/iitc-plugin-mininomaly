@@ -12,10 +12,10 @@ Key points:
 **Portal battle:** You can provide a playbox through the bookmarks. From the playbox, given number of portals will be chosen every X minutes. At the same time the faction ownership of previous set of portals will be checked. This way the raw score for measurement will be counted. The number and interval between measurements can be configured. Final score for a faction is this faction best result achieved through all measurements. Factions results can be also separately multiplied if you choose to provide a bonus (in case one faction is significantly outnumbered).
 
 **Teams shards:** You set a number and names of teams, a playzone middle point, a radius of the playzone and a distance from middle point to targets `R_t`. At given point in time, the start and end positions for each team will be chosen randomly. These will be evenly spaced, all of them at approximately the same `R_t` distance from middle point. Start and end positions for given team are on the opposite side of middle point (making them separated by distance of `2 * R_t`). Every team has their own target and will have their own shards. Every X minutes, the following things will happen for each team:
-1. If the team has a "live" shard, it will jump using the randomly chosen link attached to its current portal. It will only jump to the portals it has never visited before. If it cannot jump anywhere, it will jump to the nearest not-visited portal.
+1. If the team has a "live" shard, it will jump using the randomly chosen link attached to its current portal. It will only jump to the portals it has never visited before. If it cannot jump anywhere, it will jump to one of the the nearest not-visited portals.
 2. If in effect of a jump, the shard jumps into its target, it will score a point for the team and disappear. At the same moment the start adn end points of that team are swapped.
 3. If the team has no "live" shard, new target is being randomly chosen in the vicinity of their end point and a new shard is spawned close to the start point.
-The game continues for the given number of jumps. Score of a team is measured as a number of already scored shards plus `1 - (D_target / D_init)` where `D_target` is a distance from shard to target and `D_init` is a distance from shard spawning point to target. This means that even is the last shard is not scored, the closer a team can move its shard to the target, the better. If a team is unlucky, they may even get some negative partial points from this formula.
+The game continues for the given number of jumps. Score of a team is measured as a number of already scored shards plus `1 - (D_target / D_init)` where `D_target` is a distance from shard to target and `D_init` is a distance from shard spawning point to target. This means that even is the last shard is not scored, the closer a team can move its shard to the target, the better. If a team is unlucky, they may even get some negative partial points from this formula. Factions are not checked in this game, so teams can be cross-faction. Shards cannot be stolen, which means that moving shard of team #1 into target of team #2 will have no effect for points at all and the shard will continue to jump as described. Whole difficulty of this game lies in the fact that the teams' shortest paths cross somewhere in the middle of the playzone.
 
 ## Usage
 ### Requirements
@@ -26,6 +26,7 @@ Optional: "empty" Telegram bot to send measurements info to given chat. Without 
 ### Installation
 1. Go to the ("Releases")[https://github.com/aczekajski/iitc-plugin-mininomaly/releases] and download the `plugin.user.js` file from the newest release.
 2. Install it using your userscripts engine of choice (eg. Tampermonkey) and make sure it runs after the IITC.
+3. Make sure you're using a modern browser (newest Chrome/Opera is advised)
 
 ### Running Portal Battle
 1. Set `localStorage` values:
@@ -46,19 +47,19 @@ plugin.mininomaly.engine.configureMininomaly(
     8 // how many measurements will be taken
 );
 ```
-3. Initialize portal battle game specific settings:
+4. Initialize portal battle game specific settings:
 ```js
 plugin.mininomaly.portalBattle.initSettings({
     portalsNumber: 10, // how many portals will be randomly chosen as "ornamented" per measurement
-    bookmarksFolders: ['city center central', 'city center east']; // OPTIONAL, defaults to ['*'] - array of bookmarks folders names with playbox portals; special values: 'idOthers' (bookmarked portals that are not in folders), '*' (all bookmarked portals, without exceptions)
+    bookmarksFolders: ['city center east', 'city center west']; // OPTIONAL, defaults to ['*'] - array of bookmarks folders names with playbox portals; special values: 'idOthers' (bookmarked portals that are not in folders), '*' (all bookmarked portals, without exceptions)
     bonuses: { E: 1.4, R: 1 }, // OPTIONAL, defaults to { E: 1, R: 1 } - bonus multiplier for the outnumbered faction. If you set R to 2, points earned by the Resistance will be worth two times as much as points earned by Enlightened
 });
 ```
-4. Run:
+5. Make sure that whole playbox is visible on the IITC and run:
 ```js
 plugin.mininomaly.engine.runMininomaly();
 ```
-5. From now on, everything will happen automatically ;)
+6. From now on, everything will happen automatically ;)
 
 ### Running Team Shards
 1. Set `localStorage` values:
@@ -79,26 +80,27 @@ plugin.mininomaly.engine.configureMininomaly(
     24 // how many jumps will happen
 );
 ```
-3. Initialize team shards game specific settings:
+4. Initialize team shards game specific settings:
 ```js
 plugin.mininomaly.teamShards.initSettings = (
     { lat: 12.345678, lng: 23.456789 }, // middle point of play zone
     250, // distance in meters from middle point to start and end points (ie. shards spawn points and targets)
     300, // playzone radius, must be greater than previous parameter (shards will never jump outside this area)
     ['Suicide Squad', 'we will win', 'nameless'], // array of teams names
+    1, // OPTIONAL, defaults to 0. How many jumps the shard should wait on the same portal if there are no links leading to a non-visited portal before jumping randomly. 0 means that it will always immediately jump to a random portal if it cannot jump through a link
     ['ac494a4adb174a30b77fd122ad967d8b.16', 'fe89869209c64cb49e99a58acaf7d387.16'] // OPTIONAL, defaults to empty list. This is a list of portal GUIDs that will be excluded from the game, even if they are inside of the playzone - you can exclude inaccessible portals this way. To obtain the portals GUIDs, install "Debug: Raw portal JSON data" plugin (from official IITC site), click on portal and click "Raw Data" under the resonators list
 );
 ```
-4. Run:
+5. Make sure that whole playbox is visible on the IITC and run:
 ```js
 plugin.mininomaly.engine.runMininomaly();
 ```
-5. From now on, everything will happen automatically ;)
+6. From now on, everything will happen automatically ;)
 
 ### Stopping during mininomaly
 This should be used if you made a mistake. Resuming will not work, prepare new game instead.
 ```js
-plugin.miniNomalyPlugin.stopMininomaly();
+plugin.mininomaly.engine.stopMininomaly();
 ```
 
 ### Telegram bots configuration
@@ -110,6 +112,8 @@ It is strongly recommended to test your event before it happens.
 If you're not familiar with the plugin, tinker with it first. Run short events in your browser with few measurements and short intervals and see how it works. Make a chat with just you and the tg bot to see if you can set it properly. In case of teams shards, you can set the `localStorage['DEBUG_visualizeOnDrawTools'] = '1';` to see the game visualisation in the IITC.
 
 Make a similiar configuration to the final one and run it a day or few days before the event day. You can set the telegram bot to send it already to the chat with real players, so they can see what to expect on the game day.
+
+Because of unexpected IITC errors that happen from time to time, it is advised to have the DevTools closed while running an event.
 
 #### How to create a telegram bot:
 1. Talk to the `@BotFather` bot on Telegram

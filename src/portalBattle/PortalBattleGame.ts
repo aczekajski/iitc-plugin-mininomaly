@@ -144,10 +144,10 @@ export default class PortalBattleGame implements MininomalyGame {
         const total = { E: 0, R: 0 };
         for (const m of this.measurements) {
             if (m.points) {
-                if (m.points.E > total.E) {
+                if (m.points.E * this.settings.bonuses.E > total.E) {
                     total.E = m.points.E * this.settings.bonuses.E;
                 }
-                if (m.points.R > total.R) {
+                if (m.points.R * this.settings.bonuses.R > total.R) {
                     total.R = m.points.R * this.settings.bonuses.R;
                 }
             }

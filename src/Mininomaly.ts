@@ -19,7 +19,7 @@ export default class Mininomaly {
                 if (bkm) {
                     clearInterval(waitTimer);
 
-                    if(localStorage['mininomaly.serializedGame']) {
+                    if (localStorage['mininomaly.serializedGame']) {
                         this.game.deserialize(localStorage['mininomaly.serializedGame']);
                     }
 
@@ -49,18 +49,20 @@ export default class Mininomaly {
     runMininomaly = () => {
         const settings: MininomalyEventSettings = this.getOptions();
         if (settings
-            && settings.firstMeasurementTime
-            && (
-                (settings.preparationTime && settings.preparationTime > +new Date())
-                || settings.firstMeasurementTime > +new Date()
-            )
+            && typeof settings.firstMeasurementTime === 'number'
+            && settings.firstMeasurementTime > +new Date()
+            && typeof settings.preparationTime === 'number'
         ) {
-            localStorage['mininomaly.running'] = '1';
-            localStorage['mininomaly.nextMeasurement'] = '-1';
-            localStorage['mininomaly.phase'] = 'waiting';
-            localStorage['mininomaly.serializedGame'] = '';
-            localStorage['mininomaly.prepared'] = settings.preparationTime ? '0' : '1';
-            this.runMininomalyTimer();
+            if (!+localStorage['mininomaly.running']) {
+                localStorage['mininomaly.running'] = '1';
+                localStorage['mininomaly.nextMeasurement'] = '-1';
+                localStorage['mininomaly.phase'] = 'waiting';
+                localStorage['mininomaly.serializedGame'] = '';
+                localStorage['mininomaly.prepared'] = '0';
+                this.runMininomalyTimer();
+            } else {
+                console.error('Mininomaly already running!');
+            }
         } else {
             console.warn('No mininomaly settings found or mininomaly expired');
         }

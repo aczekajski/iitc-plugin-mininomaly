@@ -12,7 +12,7 @@ if (window.localStorage['PRIV.initMininomalyAutomatically'] === 'true') {
         let botCommunicator: BotCommunicator;
 
         if (window.localStorage['PRIV.tgBotToken'] && window.localStorage['PRIV.tgChatId']) {
-            botCommunicator = new TgBotCommunicator(window.localStorage['PRIV.tgBotToken'], +window.localStorage['PRIV.tgChatId'], /*'🚧 MINI-ANOMALY TEST 🚧\n'*/'', false);
+            botCommunicator = new TgBotCommunicator(window.localStorage['PRIV.tgBotToken'], +window.localStorage['PRIV.tgChatId'], /*'🚧 MINI-ANOMALY TEST 🚧\n'*/'', true);
         } else {
             botCommunicator = new NoopCommunicator();
         }
@@ -28,7 +28,7 @@ if (window.localStorage['PRIV.initMininomalyAutomatically'] === 'true') {
         let botCommunicator: ShardsBotCommunicator;
 
         if (window.localStorage['PRIV.tgBotToken'] && window.localStorage['PRIV.tgChatId']) {
-            botCommunicator = new ShardsTgBotCommunicator(window.localStorage['PRIV.tgBotToken'], +window.localStorage['PRIV.tgChatId'], /*'🚧 MINI-ANOMALY TEST 🚧\n'*/'', false);
+            botCommunicator = new ShardsTgBotCommunicator(window.localStorage['PRIV.tgBotToken'], +window.localStorage['PRIV.tgChatId'], /*'🚧 MINI-ANOMALY TEST 🚧\n'*/'');
         } else {
             botCommunicator = new ShardsNoopCommunicator();
         }

@@ -13,7 +13,7 @@ export default class ShardsTgBotCommunicator implements ShardsBotCommunicator {
     chatId: number;
     messagesPrefix: string;
 
-    constructor(botToken: string, chatId: number, messagesPrefix: string = '', shouldSendOverallResult: boolean = true) {
+    constructor(botToken: string, chatId: number, messagesPrefix: string = '') {
         this.botToken = botToken;
         this.chatId = chatId;
         this.messagesPrefix = messagesPrefix;

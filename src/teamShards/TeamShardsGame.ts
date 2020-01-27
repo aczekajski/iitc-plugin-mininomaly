@@ -37,6 +37,7 @@ export default class TeamShardsGame implements MininomalyGame {
     playzoneRadius: number; // in meters
     teams: TeamInfo[];
     blacklistedPortals: string[];
+    waitBeforeRandomJump: number;
 
     // TODO: make configurable in future
     readonly howManyShards: number = 1;
@@ -45,7 +46,7 @@ export default class TeamShardsGame implements MininomalyGame {
         this.botCommunicator = botCommunicator;
     }
 
-    public initSettings = (targetsMiddlePoint: LatLng, targetsRadius: number, playzoneRadius: number, teams: string[], blacklistedPortals: string[] = []) => {
+    public initSettings = (targetsMiddlePoint: LatLng, targetsRadius: number, playzoneRadius: number, teams: string[], waitBeforeRandomJump: number = 0, blacklistedPortals: string[] = []) => {
         this.targetsMiddlePoint = { ...targetsMiddlePoint };
         this.targetsRadius = targetsRadius;
         this.playzoneRadius = playzoneRadius;
@@ -58,6 +59,7 @@ export default class TeamShardsGame implements MininomalyGame {
             points: 0
         }));
         this.blacklistedPortals = blacklistedPortals;
+        this.waitBeforeRandomJump = waitBeforeRandomJump;
     }
 
     public prepareGame = (eventSettings: MininomalyEventSettings) => {
@@ -240,7 +242,6 @@ export default class TeamShardsGame implements MininomalyGame {
 
                     // check if found possible destination is not outside configured zone
                     // and if it's not in a shard history
-                    // TODO:
                     // TODO: make configurable time of shard backtracking prevention (use only a part of history)
                     if (dest && this.dist(this.targetsMiddlePoint, destLatLng) <= this.playzoneRadius && shard.history.indexOf(dest) === -1) {
                         destinations.push(dest);
@@ -251,9 +252,23 @@ export default class TeamShardsGame implements MininomalyGame {
 
         // check if destinations is not empty
         if (!destinations.length) {
-            // if it is, choose some closest portals
-            // except from the portals it was previously
-            return this.chooseClosestPortals(this.getPortalLocation(shard.portal), 3, shard.history);
+            // if it is, check if random jump should occur or if shard should wait
+            let count = 0;
+            for (let i = shard.history.length - 1; i >= 0; --i) {
+                if (shard.history[i] !== shard.portal) {
+                    break;
+                }
+                ++count;
+            }
+
+            if (count > this.waitBeforeRandomJump) {
+                // if the limit of skipped jumps is exceeded, choose some closest portals
+                // except from the portals it was previously on
+                return this.chooseClosestPortals(this.getPortalLocation(shard.portal), 3, shard.history);
+            } else {
+                // if it is not, wait on the same portal
+                return [shard.portal];
+            }
         }
 
         return destinations;
@@ -268,7 +283,8 @@ export default class TeamShardsGame implements MininomalyGame {
         targetsRadius: this.targetsRadius,
         playzoneRadius: this.playzoneRadius,
         teams: this.teams,
-        blacklistedPortals: this.blacklistedPortals
+        blacklistedPortals: this.blacklistedPortals,
+        waitBeforeRandomJump: this.waitBeforeRandomJump,
     });
 
     public deserialize = (serialized: string) => {
@@ -279,6 +295,7 @@ export default class TeamShardsGame implements MininomalyGame {
         this.playzoneRadius = deserialized.playzoneRadius;
         this.teams = deserialized.teams;
         this.blacklistedPortals = deserialized.blacklistedPortals;
+        this.waitBeforeRandomJump = deserialized.waitBeforeRandomJump;
     };
 
     private dist = (a: LatLng, b: LatLng) => {

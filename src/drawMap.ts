@@ -127,73 +127,81 @@ export const drawMapGeneric = ({
     }
 
     // draw lines
-    for (const line of lines) {
-        const points = line.latLngs;
-        const first = points.shift();
+    if (lines) {
+        for (const line of lines) {
+            const points = line.latLngs;
+            const first = points.shift();
 
-        ctx.strokeStyle = getColor(line.color || DEFAULT_ORNAMENT_COLOR);
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        const pos = latLngToXY(first);
-        ctx.moveTo(pos.x, pos.y);
-        for (const point of points) {
-            const pos = latLngToXY(point);
-            ctx.lineTo(pos.x, pos.y);
+            ctx.strokeStyle = getColor(line.color || DEFAULT_ORNAMENT_COLOR);
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            const pos = latLngToXY(first);
+            ctx.moveTo(pos.x, pos.y);
+            for (const point of points) {
+                const pos = latLngToXY(point);
+                ctx.lineTo(pos.x, pos.y);
+            }
+            ctx.stroke();
+            ctx.closePath();
         }
-        ctx.stroke();
-        ctx.closePath();
     }
 
     // draw ornaments (hexagonal)
     ctx.lineWidth = 2;
-    for (const portal of ornamentedPortals) {
-        ctx.fillStyle = getColor(portal.color || DEFAULT_ORNAMENT_COLOR, 0.3);
-        ctx.strokeStyle = getColor(portal.color || DEFAULT_ORNAMENT_COLOR);
+    if (ornamentedPortals) {
+        for (const portal of ornamentedPortals) {
+            ctx.fillStyle = getColor(portal.color || DEFAULT_ORNAMENT_COLOR, 0.3);
+            ctx.strokeStyle = getColor(portal.color || DEFAULT_ORNAMENT_COLOR);
 
-        const pos = latLngToXY(portal.pos);
-        const r = 10;
-        ctx.beginPath();
-        drawNGon(ctx, pos.x, pos.y, r, 6);
-        ctx.stroke();
-        ctx.fill();
-        ctx.closePath();
+            const pos = latLngToXY(portal.pos);
+            const r = 10;
+            ctx.beginPath();
+            drawNGon(ctx, pos.x, pos.y, r, 6);
+            ctx.stroke();
+            ctx.fill();
+            ctx.closePath();
+        }
     }
 
     // draw targets (triangles)
     ctx.lineWidth = 2;
-    for (const portal of targetPortals) {
-        ctx.fillStyle = getColor(portal.color || DEFAULT_ORNAMENT_COLOR, 0.3);
-        ctx.strokeStyle = getColor(portal.color || DEFAULT_ORNAMENT_COLOR);
+    if (targetPortals) {
+        for (const portal of targetPortals) {
+            ctx.fillStyle = getColor(portal.color || DEFAULT_ORNAMENT_COLOR, 0.3);
+            ctx.strokeStyle = getColor(portal.color || DEFAULT_ORNAMENT_COLOR);
 
-        const pos = latLngToXY(portal.pos);
-        const r = 18;
-        ctx.beginPath();
-        drawNGon(ctx, pos.x, pos.y, r, 3);
-        ctx.stroke();
-        ctx.fill();
-        ctx.closePath();
+            const pos = latLngToXY(portal.pos);
+            const r = 18;
+            ctx.beginPath();
+            drawNGon(ctx, pos.x, pos.y, r, 3);
+            ctx.stroke();
+            ctx.fill();
+            ctx.closePath();
+        }
     }
 
     //PREV
 
-    if (drawPortals || true) {
+    if (drawPortals) {
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
         ctx.lineWidth = 2;
-        for (const portal of portals) {
-            const pos = latLngToXY(portal);
-            const r = 5;
-            // ctx.fillRect((pos.lng - posMin.lng) * multiplier - 5, canvasHeight - (pos.lat - posMin.lat) * multiplier - 5, 10, 10);
-            ctx.beginPath()
-            ctx.arc(
-                pos.x,
-                pos.y,
-                r,
-                0,
-                Math.PI * 2,
-            );
-            ctx.stroke();
-            ctx.closePath();
-            // ctx.fillRect(, 10, 10);
+        if (portals) {
+            for (const portal of portals) {
+                const pos = latLngToXY(portal);
+                const r = 5;
+                // ctx.fillRect((pos.lng - posMin.lng) * multiplier - 5, canvasHeight - (pos.lat - posMin.lat) * multiplier - 5, 10, 10);
+                ctx.beginPath()
+                ctx.arc(
+                    pos.x,
+                    pos.y,
+                    r,
+                    0,
+                    Math.PI * 2,
+                );
+                ctx.stroke();
+                ctx.closePath();
+                // ctx.fillRect(, 10, 10);
+            }
         }
     }
 
@@ -201,32 +209,35 @@ export const drawMapGeneric = ({
     ctx.fillStyle = 'rgb(20, 20, 20)';
     ctx.fillRect(0, canvasHeight - legendMargin, canvasWidth, canvasHeight);
 
+    // draw legend
     const measurementDate = new Date(measurementTime);
     const timeText = `${measurementDate.getHours()}:${(measurementDate.getMinutes() < 10 ? '0' : '') + measurementDate.getMinutes()}`;
     ctx.fillStyle = 'rgb(0, 255, 236)';
-    ctx.font = '14px Coda';
+    ctx.font = '14px Coda, Roboto, Arial';
     ctx.textAlign = 'right';
     ctx.fillText(`measurement at ${timeText}`, canvasWidth - 5, canvasHeight - 5);
 
-    legend.forEach((entry, i) => {
-        ctx.fillStyle = 'rgb(180, 180, 180)';
-        ctx.textAlign = 'left';
-        ctx.fillText(entry.label, 40, canvasHeight - legendMargin + i * legendEntrySpace + 1.5 * legendEntrySpace - 10);
+    if (legend) {
+        legend.forEach((entry, i) => {
+            ctx.fillStyle = 'rgb(180, 180, 180)';
+            ctx.textAlign = 'left';
+            ctx.fillText(entry.label, 40, canvasHeight - legendMargin + i * legendEntrySpace + 1.5 * legendEntrySpace - 10);
 
-        ctx.fillStyle = getColor(entry.color || DEFAULT_ORNAMENT_COLOR, 0.3);
-        ctx.strokeStyle = getColor(entry.color || DEFAULT_ORNAMENT_COLOR);
+            ctx.fillStyle = getColor(entry.color || DEFAULT_ORNAMENT_COLOR, 0.3);
+            ctx.strokeStyle = getColor(entry.color || DEFAULT_ORNAMENT_COLOR);
 
-        const pos = {
-            x: 20,
-            y: canvasHeight - legendMargin + i * legendEntrySpace + legendEntrySpace
-        };
-        const r = 10;
-        ctx.beginPath();
-        drawNGon(ctx, pos.x, pos.y, r, 6);
-        ctx.stroke();
-        ctx.fill();
-        ctx.closePath();
-    });
+            const pos = {
+                x: 20,
+                y: canvasHeight - legendMargin + i * legendEntrySpace + legendEntrySpace
+            };
+            const r = 10;
+            ctx.beginPath();
+            drawNGon(ctx, pos.x, pos.y, r, 6);
+            ctx.stroke();
+            ctx.fill();
+            ctx.closePath();
+        });
+    }
 
     return canvas;
 }
