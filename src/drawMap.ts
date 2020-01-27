@@ -1,7 +1,7 @@
 import { LatLng } from "./commonInterfaces";
 import colors from "./colors";
 
-const mapLines = JSON.parse(window.localStorage['PRIV.mapLines']) || [];
+const mapLines = JSON.parse(window.localStorage['PRIV.mapLines'] || '[]');
 
 const getLatLngFromE6 = (latlng: string): LatLng => {
     const split = latlng.split(',');
