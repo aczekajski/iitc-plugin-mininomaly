@@ -51,7 +51,7 @@ plugin.mininomaly.engine.configureMininomaly(
 ```js
 plugin.mininomaly.portalBattle.initSettings({
     portalsNumber: 10, // how many portals will be randomly chosen as "ornamented" per measurement
-    bookmarksFolders: ['city center east', 'city center west']; // OPTIONAL, defaults to ['*'] - array of bookmarks folders names with playbox portals; special values: 'idOthers' (bookmarked portals that are not in folders), '*' (all bookmarked portals, without exceptions)
+    bookmarksFolders: ['city center east', 'city center west'], // OPTIONAL, defaults to ['*'] - array of bookmarks folders names with playbox portals; special values: 'idOthers' (bookmarked portals that are not in folders), '*' (all bookmarked portals, without exceptions)
     bonuses: { E: 1.4, R: 1 }, // OPTIONAL, defaults to { E: 1, R: 1 } - bonus multiplier for the outnumbered faction. If you set R to 2, points earned by the Resistance will be worth two times as much as points earned by Enlightened
 });
 ```
