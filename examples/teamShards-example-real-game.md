@@ -34,6 +34,7 @@ plugin.mininomaly.engine.runMininomaly();
 This is a game that will happen on January 1st 2020.
 
 Timeline:
+
 | time  | event                                     |
 | ----- | ----------------------------------------- |
 | 12:45 | The start positions will be sent to teams |
