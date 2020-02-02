@@ -82,7 +82,7 @@ plugin.mininomaly.engine.configureMininomaly(
 ```
 4. Initialize team shards game specific settings:
 ```js
-plugin.mininomaly.teamShards.initSettings = (
+plugin.mininomaly.teamShards.initSettings(
     { lat: 12.345678, lng: 23.456789 }, // middle point of play zone
     250, // distance in meters from middle point to start and end points (ie. shards spawn points and targets)
     300, // playzone radius, must be greater than previous parameter (shards will never jump outside this area)
